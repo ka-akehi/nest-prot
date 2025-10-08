@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   HttpStatus,
   Param,
   Post,
@@ -11,7 +12,6 @@ import {
 import { type Response } from 'express';
 import { CatsService } from 'src/cats/cats.service';
 import { CreateCatDto } from 'src/cats/dto/cat.dto';
-import { Cat } from 'src/cats/interface/cat.interface';
 
 @Controller('cats')
 export class CatsController {
@@ -23,8 +23,21 @@ export class CatsController {
   }
 
   @Get()
-  async findAll(): Promise<Cat[]> {
-    return this.catsService.findAll();
+  async findAll() {
+    try {
+      return this.catsService.findAll();
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: 'This is a custom message',
+        },
+        HttpStatus.FORBIDDEN,
+        {
+          cause: error,
+        },
+      );
+    }
   }
 
   @Get(':id')
