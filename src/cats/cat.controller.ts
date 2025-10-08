@@ -1,8 +1,7 @@
 import {
+  Body,
   Controller,
   Get,
-  Header,
-  HttpCode,
   HttpStatus,
   Param,
   Post,
@@ -10,19 +9,22 @@ import {
   Res,
 } from '@nestjs/common';
 import { type Response } from 'express';
+import { CatsService } from 'src/cats/cats.service';
+import { CreateCatDto } from 'src/cats/dto/cat.dto';
+import { Cat } from 'src/cats/interface/cat.interface';
 
 @Controller('cats')
 export class CatsController {
+  constructor(private catsService: CatsService) {}
+
   @Post()
-  @Header('Cache-Control', 'no-store')
-  @HttpCode(HttpStatus.OK)
-  create() {
-    return 'This action adds a new cat';
+  async create(@Body() createCatDto: CreateCatDto) {
+    this.catsService.create(createCatDto);
   }
 
-  @Get('abcd/*')
-  findAll(): string {
-    return 'This action returns all cats';
+  @Get()
+  async findAll(): Promise<Cat[]> {
+    return this.catsService.findAll();
   }
 
   @Get(':id')
