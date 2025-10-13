@@ -1,15 +1,23 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CatsController } from 'src/cats/cat.controller';
-import { CatsService } from './cats/cats.service';
 import { CatsModule } from './cats/cats.module';
-import { LoggerMiddleware } from 'src/common/middleware/logger.middleware';
+import { CatEntity } from './cats/entities/cat.entity';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
-  imports: [CatsModule],
-  controllers: [AppController, CatsController],
-  providers: [AppService, CatsService],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: 'db.sqlite',
+      entities: [CatEntity],
+      synchronize: true,
+    }),
+    CatsModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

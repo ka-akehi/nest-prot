@@ -2,62 +2,29 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
-  Query,
-  Res,
 } from '@nestjs/common';
-import { type Response } from 'express';
-import { CatsService } from 'src/cats/cats.service';
-import { CreateCatDto } from 'src/cats/dto/cat.dto';
+import { CatsService } from './cats.service';
+import { CreateCatDto } from './dto/cat.dto';
 
 @Controller('cats')
 export class CatsController {
-  constructor(private catsService: CatsService) {}
+  constructor(private readonly catsService: CatsService) {}
 
   @Post()
-  async create(@Body() createCatDto: CreateCatDto) {
-    this.catsService.create(createCatDto);
+  create(@Body() createCatDto: CreateCatDto) {
+    return this.catsService.create(createCatDto);
   }
 
   @Get()
-  async findAll() {
-    try {
-      return this.catsService.findAll();
-    } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.FORBIDDEN,
-          error: 'This is a custom message',
-        },
-        HttpStatus.FORBIDDEN,
-        {
-          cause: error,
-        },
-      );
-    }
+  findAll() {
+    return this.catsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): string {
-    console.log(id);
-    return `This action returns a #${id} cat`;
-  }
-
-  @Get()
-  fetch(@Query('age') age: number, @Query('breed') breed: string) {
-    return `This action returns all cats filtered by age: ${age} and breed: ${breed}`;
-  }
-
-  @Post()
-  postExample(@Res() res: Response) {
-    res.status(HttpStatus.CREATED).send();
-  }
-
-  @Get()
-  getExample(@Res() res: Response) {
-    res.status(HttpStatus.OK).json([]);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.catsService.findOne(id);
   }
 }
