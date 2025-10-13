@@ -1,21 +1,12 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CatsModule } from './cats/cats.module';
-import { CatEntity } from './cats/entities/cat.entity';
+import { PrismaModule } from './prisma/prisma.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'db.sqlite',
-      entities: [CatEntity],
-      synchronize: true,
-    }),
-    CatsModule,
-  ],
+  imports: [PrismaModule, CatsModule],
   controllers: [AppController],
   providers: [AppService],
 })

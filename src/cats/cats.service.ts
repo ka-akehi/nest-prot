@@ -1,26 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateCatDto } from './dto/cat.dto';
-import { CatEntity } from './entities/cat.entity';
 
 @Injectable()
 export class CatsService {
-  constructor(
-    @InjectRepository(CatEntity)
-    private readonly catsRepository: Repository<CatEntity>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   create(createCatDto: CreateCatDto) {
-    const cat = this.catsRepository.create(createCatDto);
-    return this.catsRepository.save(cat);
+    return this.prisma.cat.create({ data: { ...createCatDto } });
   }
 
   findAll() {
-    return this.catsRepository.find();
+    return this.prisma.cat.findMany();
   }
 
   findOne(id: number) {
-    return this.catsRepository.findOneBy({ id });
+    return this.prisma.cat.findUnique({ where: { id } });
   }
 }
